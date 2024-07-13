@@ -30,11 +30,45 @@ SOLUÇÂO:
 
 
 var fields = document.querySelectorAll("#form-user-create [name]");
+var user = {};
 
-fields.forEach(function(field, index){
+document.getElementById("form-user-create").addEventListener("submit", function (event) {
 
-    console.log(field.name);
+    event.preventDefault();
+
+    fields.forEach(function (field, index) {
+
+        if (field.name == "gender") {
+
+            if (field.checked) {
+
+                user[field.name] = field.value;
+
+            }
+
+        } else {
+
+            user[field.name] = field.value;
+
+        }
+
+        console.log(user)
+
+        //console.log(field.id, field.name, field.value, field.checked, index);
+
+    });
+
+
 
 });
 
+
+// document.querySelectorAll("button").forEach(function() {
+
+//     this.addEventListener("click", function() {
+
+//         console.log("clicou!");
+//     })
+
+// });
 
