@@ -48,7 +48,7 @@ class User {
     }
 
     set photo(value){
-        this._photo
+        this._photo = value;
     }
 
     get admin(){
