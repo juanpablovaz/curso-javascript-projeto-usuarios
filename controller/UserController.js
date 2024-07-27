@@ -1,8 +1,9 @@
 class UserController {
 
-    constructor(formId, tableId) {
+    constructor(formIdCreate, formIdUpdate, tableId) {
 
-        this.formEl = document.getElementById(formId);
+        this.formEl = document.getElementById(formIdCreate);
+        this.formUpdateEl = document.getElementById(formIdUpdate);
         this.tableEl = document.getElementById(tableId);
 
         this.onSubmit();
@@ -15,8 +16,15 @@ class UserController {
         document.querySelector("#box-user-update .btn-cancel").addEventListener("click", e => {
 
             this.showPanelCreate();
+        });
+
+        this.formUpdateEl.addEventListener("submit", e =>{
+
+
+            
         })
     }
+
 
     onSubmit() {
 
@@ -108,6 +116,7 @@ class UserController {
 
                     user[field.name] = field.value;
 
+
                 }
 
             } else if (field.name == "admin") {
@@ -163,9 +172,40 @@ class UserController {
 
         tr.querySelector(".btn-edit").addEventListener("click", e => {
 
-            
-            console.log(JSON.parse(tr.dataset.user));
-            
+
+            let json = JSON.parse(tr.dataset.user);
+            let form = document.querySelector("#form-user-update")
+
+            for (let name in json) {
+
+                let field = form.querySelector("[name=" + name.replace("_", "") + "]");
+
+                if (field) {
+
+                    switch (field.type) {
+
+                        case 'file':
+                            continue;
+                            break;
+
+                        case 'radio':
+                            field = form.querySelector("[name=" + name.replace("_", "") + "][value=" + json[name] + "]");
+                            field.checked = true
+                            break;
+
+                        case 'checkbox':
+
+                            field.checked = json[name]
+                            break;
+
+                        default:
+                            field.value = json[name];
+
+                    }
+
+                }
+            }
+
             this.showPanelUpdate();
 
         })
