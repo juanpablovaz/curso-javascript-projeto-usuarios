@@ -20,8 +20,11 @@ class UserController {
 
         this.formUpdateEl.addEventListener("submit", e =>{
 
-
-            
+            event.preventDefault();
+            let btn = this.formUpdateEl.querySelector('[type=submit]');
+            btn.disable = true;
+            let values = this.getValues(this.formUpdateEl);
+            console.log(values)
         })
     }
 
@@ -37,7 +40,7 @@ class UserController {
 
             btn.disable = true;
 
-            let values = this.getValues();
+            let values = this.getValues(this.formEl);
 
             // if (!values) return false;
 
@@ -94,14 +97,14 @@ class UserController {
 
     }
 
-    getValues() {
+    getValues(formEl) {
 
         let user = {};
         // let isValid = true;
 
         //this.formEl.elements[0], this.formEl.elements[1]......
 
-        [...this.formEl.elements].forEach((field, index) => {
+        [...formEl.elements].forEach((field, index) => {
 
             // if (['name', 'email', 'password'].indexOf((field.name) > -1 && !field.value)) {
 
