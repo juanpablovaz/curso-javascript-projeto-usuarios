@@ -19,12 +19,12 @@ class UserController {
             this.showPanelCreate();
         });
 
-        this.formUpdateEl.addEventListener("submit", event =>{
+        this.formUpdateEl.addEventListener("submit", event => {
 
             event.preventDefault();
 
             let btn = this.formUpdateEl.querySelector('[type=submit]');
-            
+
             btn.disable = true;
 
             let values = this.getValues(this.formUpdateEl);
@@ -37,30 +37,22 @@ class UserController {
             let userOld = JSON.parse(tr.dataset.user);
 
             let result = Object.assign({}, userOld, values);
-            
-        this.addEventsTr(tr);
 
-        this.updateCount();
+            this.showPanelCreate();
 
-        btn.disable = false;
+            this.getPhoto(this.formUpdateEl).then(
+                (content) => {
 
-        this.formUpdateEl.reset;
+                    if (!values.photo) {
+                        result._photo = userOld._photo;
+                    } else {
+                        result._photo = content;
+                    }
 
-        
-
-        this.getPhoto(this.formUpdateEl).then(
-            (content) => {
-
-                if (!values.photo) {
-                    result._photo = userOld._photo;
-                } else{
-                    result._photo = content;
-                }
-
-                tr.dataset.user = JSON.stringify(result);
+                    tr.dataset.user = JSON.stringify(result);
 
 
-                tr.innerHTML = `
+                    tr.innerHTML = `
             
                 <td><img src="${result._photo}" alt="User Image" class="img-circle img-sm"></td>
                 <td>${result._name}</td>
@@ -74,16 +66,20 @@ class UserController {
             
         `;
 
-                this.formUpdateEl.reset();
+                    this.addEventsTr(tr);
 
-                btn.disable = false
+                    this.updateCount();
 
-                this.showPanelCreate();
-            },
-            (e) => {
-                console.error(e)
-            }
-        )
+                    this.formUpdateEl.reset();
+
+                    btn.disable = false
+
+                    this.showPanelCreate();
+                },
+                (e) => {
+                    console.error(e)
+                }
+            )
 
         })
     }
@@ -228,7 +224,7 @@ class UserController {
                 <td>${Utils.dateFormat(dataUser.register)}</td>
                 <td>
                     <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                    <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+                    <button type="button" class="btn btn-danger btn-delete btn-xs btn-flat">Excluir</button>
                 </td>
             
         `;
@@ -243,11 +239,23 @@ class UserController {
 
     }
 
-    addEventsTr(tr){
+    addEventsTr(tr) {
+
+        tr.querySelector(".btn-delete").addEventListener("click", e => {
+
+            if(confirm("Deseja realmente excluir?")) {
+                tr.remove();
+
+                this.updateCount();
+            }
+
+        });
+
+
         tr.querySelector(".btn-edit").addEventListener("click", e => {
 
             let json = JSON.parse(tr.dataset.user);
-        
+
 
             this.formUpdateEl.dataset.trIndex = tr.sectionRowIndex;
 
