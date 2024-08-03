@@ -8,6 +8,7 @@ class UserController {
 
         this.onSubmit();
         this.onEdit();
+        this.selectAll();
 
     }
 
@@ -38,7 +39,6 @@ class UserController {
 
             let result = Object.assign({}, userOld, values);
 
-            this.showPanelCreate();
 
             this.getPhoto(this.formUpdateEl).then(
                 (content) => {
@@ -49,24 +49,13 @@ class UserController {
                         result._photo = content;
                     }
 
-                    tr.dataset.user = JSON.stringify(result);
+                    let user = new User();
 
+                    user.loadFromJSON(result);
 
-                    tr.innerHTML = `
-            
-                <td><img src="${result._photo}" alt="User Image" class="img-circle img-sm"></td>
-                <td>${result._name}</td>
-                <td>${result._email}</td>
-                <td>${(result._admin) ? 'sim' : 'nao'}</td>
-                <td>${Utils.dateFormat(result._register)}</td>
-                <td>
-                    <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                    <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
-                </td>
-            
-        `;
-
-                    this.addEventsTr(tr);
+                    user.save();
+                    
+                    this.getTr(user, tr);
 
                     this.updateCount();
 
@@ -103,6 +92,8 @@ class UserController {
             this.getPhoto(this.formEl).then(
                 (content) => {
                     values.photo = content;
+
+                    values.save();
 
                     this.addLine(values);
 
@@ -207,13 +198,52 @@ class UserController {
         return objectUser;
     }
 
+    selectAll(){
 
-    addLine(dataUser) {
+        let users = User.getUsersStorage();
 
-        let tr = document.createElement('tr');
+        users.forEach(dataUser =>{
+
+            let user = new User();
+
+            user.loadFromJSON(dataUser);
+
+            this.addLine(user)
+        });
+        
+
+    }
+
+
+    // insert(data)  Metodo insert serve para inserirmos as informações do usuario no localStorage {
+
+    //     let users = this.getUsersStorage();
+        
+
+    //     users.push(data);
+
+    //     //sessionStorage.setItem("users" , JSON.stringify(users));
+    //     localStorage.setItem("users" , JSON.stringify(users));
+
+    // }
+    
+    addLine /*Metodo que seleciona uma nova linha tr da tabela*/ (dataUser) {
+
+        let tr = this.getTr(dataUser);
+
+        this.tableEl.appendChild(tr) /* Metodo que adiciona no final da tabela*/;
+
+        this.updateCount() /*Acessa a tabela e procura todas as tr. 
+                            *Por isso é um metodo que tera repetições 
+                            *e não pode ficar dentro do metodo getTR()*/;
+
+    }
+
+    getTr /* Metodo que seleciona qual a tr que vamos gerar */(dataUser, tr = null){
+
+        if(tr === null) tr = document.createElement('tr');
 
         tr.dataset.user = JSON.stringify(dataUser);
-
 
         tr.innerHTML = `
             
@@ -231,12 +261,7 @@ class UserController {
 
         this.addEventsTr(tr);
 
-
-        this.tableEl.appendChild(tr);
-
-
-        this.updateCount();
-
+        return tr;
     }
 
     addEventsTr(tr) {
@@ -244,6 +269,13 @@ class UserController {
         tr.querySelector(".btn-delete").addEventListener("click", e => {
 
             if(confirm("Deseja realmente excluir?")) {
+
+                let user = new User();
+
+                user.loadFromJSON(JSON.parse(tr.dataset.user))
+
+                user.remove();
+
                 tr.remove();
 
                 this.updateCount();
